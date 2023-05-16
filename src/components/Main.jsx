@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import { FaPlay } from "react-icons/fa";
 import { AiOutlineInfoCircle } from "react-icons/ai";
@@ -41,46 +41,16 @@ export default function Main() {
     carregarTop10().catch((err) => console.log(err));
   }, []);
 
-  //https://api.themoviedb.org/3/movie/{movie_id}/release_dates
-  // console.log(filme?.id);
-  // console.log(filme?.id);
-  //`${baseURL}/discover/movie/week?api_key=${apiKEY}&with_networks=213`
-  // async function getTMDB() {
-  //   const baseURL = "https://api.themoviedb.org/3";
-  //   const apiKEY = "98def43abee228fc5dcae8ee5c2fddcc";
-  //   const reqs = {
-  //     tendencias: `${baseURL}/trending/all/week?api_key=${apiKEY}&language=pt-BR`,
-  //     originalNetflix: `${baseURL}/discover/movie/week?api_key=${apiKEY}&with_networks=213`,
-  //     maisVotados: `${baseURL}/movie/top_rated?api_key=${apiKEY}&language=pt-BR`,
-  //     filmesAcao: `${baseURL}/discover/movie?api_key=${apiKEY}&language=pt-BR&with_genres=28`,
-  //     filmesComedia: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=35`,
-  //     filmesTerror: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=27`,
-  //     filmesRomance: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=10749`,
-  //     documentarios: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=99`,
-  //   };
-  //   const [
-  //     tendencias,
-  //     originalNetflix,
-  //     maisVotados,
-  //     filmesAcao,
-  //     filmesComedia,
-  //     filmesTerror,
-  //     filmesRomance,
-  //     documentarios,
-  //   ] = await Promise.all([
-  //     fetch(reqs.tendencias).then((res) => res.json()),
-  //     fetch(reqs.originalNetflix).then((res) => res.json()),
-  //     fetch(reqs.maisVotados).then((res) => res.json()),
-  //     fetch(reqs.filmesAcao).then((res) => res.json()),
-  //     fetch(reqs.filmesComedia).then((res) => res.json()),
-  //     fetch(reqs.filmesTerror).then((res) => res.json()),
-  //     fetch(reqs.filmesRomance).then((res) => res.json()),
-  //     fetch(reqs.documentarios).then((res) => res.json()),
-  //   ]);
-  // }
-  // getTMDB();
-  // useEffect(() => {
-  // }, []);
+  /* URLs dos flimes/séries/documentários:
+    tendencias: `${baseURL}/trending/all/week?api_key=${apiKEY}&language=pt-BR`,
+    originalNetflix: `${baseURL}/discover/movie/week?api_key=${apiKEY}&with_networks=213`,
+    maisVotados: `${baseURL}/movie/top_rated?api_key=${apiKEY}&language=pt-BR`,
+    filmesAcao: `${baseURL}/discover/movie?api_key=${apiKEY}&language=pt-BR&with_genres=28`,
+    filmesComedia: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=35`,
+    filmesTerror: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=27`,
+    filmesRomance: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=10749`,
+    documentarios: `${baseURL}/discover/movie?week?api_key=${apiKEY}&language=pt-BR&with_genres=99`,
+  */
   return (
     <Container>
       <img
@@ -90,7 +60,6 @@ export default function Main() {
       />
       <div id="desc">
         <h2>{tendencia?.title || tendencia?.name}</h2>
-        {/* <p>{truncarString(filme?.overview, 150)}</p> */}
       </div>
       <div className="btns">
         <div id="play">
@@ -109,17 +78,17 @@ export default function Main() {
 
 const Container = styled.section`
   position: relative;
-  max-width: 100%;
+  max-width: 100vw;
   height: 10rem;
   .capaPrincipal {
-    width: 100%;
+    width: 100vw;
     height: 100vh;
     filter: brightness(0.4);
     object-fit: cover;
   }
   #desc {
     position: absolute;
-    top: 28rem;
+    top: 70vh;
     left: 4rem;
     color: #ffffff;
 
@@ -136,7 +105,7 @@ const Container = styled.section`
     position: absolute;
     display: flex;
     gap: 1rem;
-    top: 34rem;
+    top: 82vh;
     left: 4rem;
 
     #play {
@@ -160,10 +129,11 @@ const Container = styled.section`
       font-weight: bold;
     }
   }
-  @media (max-width: 1000px) {
+  @media (max-width: 769px) {
     #desc {
       max-width: 90%;
       left: 1rem;
+      top: 75vh;
       h2 {
         font-size: 1.5rem;
       }
@@ -176,11 +146,20 @@ const Container = styled.section`
       }
     }
   }
+  @media (max-width: 450px) {
+    #desc {
+      top: 70vh;
+    }
+    .btns {
+      #play,
+      #info {
+        padding: 0.5rem;
+      }
+    }
+  }
 `;
 
 const ContainerTopRated = styled.div`
   position: absolute;
   left: 4rem;
-  display: flex;
-  gap: 5rem;
 `;

@@ -16,21 +16,16 @@ export default React.memo(function Header() {
 
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth <= 1000; // Define 768px como limite para ser considerado um dispositivo móvel
+      const isMobile = window.innerWidth <= 1000;
       setIsMobile(isMobile);
     };
-
-    // Verificar o tamanho da tela no carregamento inicial
     handleResize();
-
-    // Adicionar o ouvinte de redimensionamento
     window.addEventListener("resize", handleResize);
-
-    // Remover o ouvinte de redimensionamento ao desmontar o componente
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  
   const handleProfile = () => {
     isVisible ? setIsVisible(false) : setIsVisible(true);
   };
@@ -179,13 +174,13 @@ const Nav = styled.nav`
   gap: 1.5rem;
   @media (max-width: 1000px) {
     opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
-    transition: 0.2s all;
+    transition: 0.2s ease-in-out;
     padding: 1rem;
     position: fixed;
-    right: calc(100vw - 85vw);
+    right: calc(100% - 100vw);
     top: 4.4rem;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.9);
   }
 `;
 

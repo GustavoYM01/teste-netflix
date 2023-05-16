@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import AboutMovie from "./AboutMovie";
 
@@ -6,6 +6,7 @@ export default React.memo(function TopRated({ top10 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [urlVideos, setUrlVideos] = useState({});
   const [votesAverage, setVotesAverage] = useState({});
+  const [classification, setClassification] = useState({});
   const [hoveredItem, setHoveredItem] = useState(null);
   const bests = top10?.slice(0, 10);
 
@@ -14,6 +15,7 @@ export default React.memo(function TopRated({ top10 }) {
   const handleMouseEnter = (id) => {
     setHoveredItem(id);
     getVideo(id);
+    getClassification(id);
     getVotesAverage(id);
   };
 
@@ -27,19 +29,11 @@ export default React.memo(function TopRated({ top10 }) {
       ...prevVotesAverage,
       [id]: null,
     }));
+    setClassification((prevClassifications) => ({
+      ...prevClassifications,
+      [id]: null,
+    }));
   };
-
-  // const handleNext = () => {
-  //   setCurrentIndex((prevIndex) =>
-  //     prevIndex + 1 < bests?.length ? prevIndex + 1 : 0
-  //   );
-  // };
-
-  // const handlePrev = () => {
-  //   setCurrentIndex((prevIndex) =>
-  //     prevIndex - 1 >= 0 ? prevIndex - 1 : bests?.length - 1
-  //   );
-  // };
 
   const getVideo = async (id) => {
     const response = await fetch(
@@ -56,6 +50,38 @@ export default React.memo(function TopRated({ top10 }) {
 
     setUrlVideos((prevUrlVideos) => ({
       ...prevUrlVideos,
+      [id]: response,
+    }));
+  };
+
+  const getClassification = async (id) => {
+    const response = await fetch(
+      `${baseURL}/movie/${id}/release_dates?api_key=${process.env.REACT_APP_TMDB_KEY}`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        const resultBR = res?.results.find(
+          (result) => result?.iso_3166_1 === "BR"
+        );
+        if (resultBR !== null) {
+          const releaseDates = resultBR?.release_dates;
+          if (releaseDates?.length > 0) {
+            const certification = releaseDates[0]?.certification;
+            return certification;
+          } else {
+            console.log(
+              "Não foram encontradas datas de lançamento no objeto 'resultBR'."
+            );
+          }
+        } else {
+          console.log(
+            "Não foi encontrado um objeto 'results' com iso_3166_1 igual a 'BR'."
+          );
+        }
+      })
+      .catch((err) => console.log(err));
+    setClassification((prevClassifications) => ({
+      ...prevClassifications,
       [id]: response,
     }));
   };
@@ -102,7 +128,7 @@ export default React.memo(function TopRated({ top10 }) {
   return (
     <SliderContainer>
       <div>
-        <h2>Top 10 em filmes hoje</h2>
+        <h2>Top 10 em tendências da semana</h2>
       </div>
       <Slider translateValue={currentIndex * -(100 / itemCount)}>
         {bests?.map((filme, i) => (
@@ -122,10 +148,11 @@ export default React.memo(function TopRated({ top10 }) {
                 nome={filme?.title || filme?.original_title}
                 srcVideo={urlVideos[filme?.id]}
                 votos={votesAverage[filme?.id]}
+                classificacao={classification[filme?.id]}
                 isModalOpen={isModalOpen}
               />
             )}
-            <p>{i + 1}</p>
+            <p id="classification">{i + 1}</p>
             <img
               src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
               alt="Capa do filme"
@@ -158,30 +185,50 @@ const Container = styled.div`
     max-height: 15rem;
     object-fit: fill;
   }
-  @media (max-width: 1000px) {
-    p {
-      font-size: 10rem;
-      margin-right: -1rem;
+  @media (max-width: 450px) {
+    max-width: 100%;
+    #classification {
+      display: none;
     }
   }
 `;
 
 const SliderContainer = styled.div`
-  max-width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
+  max-width: 90vw;
+  margin-top: 3rem;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  div h2 {
+    position: absolute;
+    left: -2.5rem;
+    top: 0.5rem;
+  }
 
   h2 {
     color: #fff;
   }
 
-  @media (max-width: 1000px) {
-    max-width: 100vw;
-    h2 {
-      display: none;
-    }
+  @media (max-width: 769px) {
     display: flex;
     flex-wrap: nowrap;
     justify-content: flex-start;
+    /* overflow: hidden; */
+    max-width: 80vw;
+    margin-top: 3rem;
+    /* margin-left: -1.5rem; */
+    div h2 {
+      position: absolute;
+      left: -2.5rem;
+      top: 0.5rem;
+    }
+  }
+
+  @media (max-width: 450px) {
+    h2 {
+      font-size: 1.1rem;
+    }
   }
 `;
 
@@ -190,10 +237,8 @@ const Slider = styled.div`
   gap: 5rem;
   transition: transform 0.3s ease;
   transform: translateX(${(props) => props.translateValue}%);
-  p {
-    &:last-child {
-      margin-left: -3rem;
-    }
+  @media (max-width: 769px) {
+    gap: 2rem;
   }
 `;
 
@@ -209,6 +254,7 @@ const Button = styled.button`
     id === "btnPrev" &&
     css`
       position: absolute;
+      z-index: 999;
       top: 5rem;
       left: -4rem;
     `}
@@ -217,8 +263,9 @@ const Button = styled.button`
     id === "btnNext" &&
     css`
       position: absolute;
+      z-index: 999;
       top: 5rem;
       right: 0;
-      left: calc(100vw - 10rem);
+      left: calc(100vw - 7rem);
     `}
 `;
