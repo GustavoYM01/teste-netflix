@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import AboutMovie from "./AboutMovie";
 
-export default React.memo(function TopRated({ top10 }) {
+export default React.memo(function TopTrending({ top10 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [urlVideos, setUrlVideos] = useState({});
   const [votesAverage, setVotesAverage] = useState({});

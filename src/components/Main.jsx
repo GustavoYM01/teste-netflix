@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import { FaPlay } from "react-icons/fa";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import TopRated from "./TopRated";
+import TopTrending from "./TopTrending";
 
 export default function Main() {
   const [tendencia, setTendencia] = useState(null);
@@ -69,9 +69,9 @@ export default function Main() {
           <AiOutlineInfoCircle size={25} /> Mais informações
         </div>
       </div>
-      <ContainerTopRated>
-        <TopRated top10={top10} />
-      </ContainerTopRated>
+      <ContainerTopTrending>
+        <TopTrending top10={top10} />
+      </ContainerTopTrending>
     </Container>
   );
 }
@@ -159,7 +159,7 @@ const Container = styled.section`
   }
 `;
 
-const ContainerTopRated = styled.div`
+const ContainerTopTrending = styled.div`
   position: absolute;
   left: 4rem;
 `;
