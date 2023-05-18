@@ -26,7 +26,7 @@ export default React.memo(function AboutMovie({
         <div id="trailerVideo">
           <ReactPlayer url={srcVideo} controls playing />
         </div>
-      ) : (
+      ) : isMoblie ? null : (
         <div id="noVideo">
           <p>Sem pré-visualização</p>
         </div>
@@ -94,6 +94,11 @@ const Container = styled.div`
     }
   }
   @media (max-width: 450px) {
+    .classification {
+      max-width: 20% !important;
+      margin-top: 0.8rem !important;
+      padding: 1px 2px;
+    }
     .movieInfo {
       max-width: 90%;
     }
@@ -106,7 +111,7 @@ const Container = styled.div`
   }
   @media (max-width: 769px) {
     .classification {
-      max-width: 12%;
+      max-width: 15%;
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
     }
