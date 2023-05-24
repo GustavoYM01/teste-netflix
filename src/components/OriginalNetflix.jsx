@@ -1,53 +1,32 @@
 import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
 import AboutMovie from "./AboutMovie";
-import topt1 from "../assets/top10/1.svg";
-import topt2 from "../assets/top10/2.svg";
-import topt3 from "../assets/top10/3.svg";
-import topt4 from "../assets/top10/4.svg";
-import topt5 from "../assets/top10/5.svg";
-import topt6 from "../assets/top10/6.svg";
-import topt7 from "../assets/top10/7.svg";
-import topt8 from "../assets/top10/8.svg";
-import topt9 from "../assets/top10/9.svg";
-import topt10 from "../assets/top10/10.svg";
-import Xablau from "../assets/xablau.png";
+import Meliodas from "../assets/Meliodas.jpg";
+import Jailson from "../assets/jailson.jpg";
 
-export default React.memo(function TopTrending({ top10 }) {
+export default function OriginalNetflix({ originalNetflix }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [mathValue, setMathValue] = useState(0);
   const [urlVideos, setUrlVideos] = useState({});
-  const [votesAverage, setVotesAverage] = useState({});
+  // const [votesAverage, setVotesAverage] = useState({});
+  const [mathValue, setMathValue] = useState(0);
   const [classification, setClassification] = useState({});
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(null);
   const [btnIsVisible, setBtnIsVisible] = useState(true);
 
-  const bests = top10?.slice(0, 10);
+  const items = originalNetflix?.slice(0, 10);
 
-  const itemCount = bests?.length;
+  const itemCount = items?.length;
 
   const baseURL = "https://api.themoviedb.org/3";
-
-  const imageImports = [
-    topt1,
-    topt2,
-    topt3,
-    topt4,
-    topt5,
-    topt6,
-    topt7,
-    topt8,
-    topt9,
-    topt10,
-  ];
 
   const handleMouseEnter = (id) => {
     setHoveredItem(id);
     getVideo(id);
     getClassification(id);
-    getVotesAverage(id);
+    // getCoisa(id);
+    // getVotesAverage(id);
   };
 
   const handleMouseLeave = (id) => {
@@ -56,26 +35,26 @@ export default React.memo(function TopTrending({ top10 }) {
       ...prevUrlVideos,
       [id]: null,
     }));
-    setVotesAverage((prevVotesAverage) => ({
-      ...prevVotesAverage,
-      [id]: null,
-    }));
+    // setVotesAverage((prevVotesAverage) => ({
+    //   ...prevVotesAverage,
+    //   [id]: null,
+    // }));
     setClassification((prevClassifications) => ({
       ...prevClassifications,
       [id]: null,
     }));
   };
-
+  //https://api.themoviedb.org/3/tv/119051/videos?api_key=98def43abee228fc5dcae8ee5c2fddcc&language=pt-BR
   const getVideo = async (id) => {
     const response = await fetch(
-      `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
+      `${baseURL}/tv/${id}/videos?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR`
     )
       .then((res) => res.json())
       .then((res) => {
-        const trailerIndex = res?.videos?.results?.findIndex(
+        const trailerIndex = res?.results?.findIndex(
           (element) => element?.type === "Trailer"
         );
-        const trailerURL = `https://www.youtube.com/watch?v=${res?.videos?.results[trailerIndex]?.key}`;
+        const trailerURL = `https://www.youtube.com/watch?v=${res?.results[trailerIndex]?.key}`;
         return trailerURL;
       });
 
@@ -85,30 +64,25 @@ export default React.memo(function TopTrending({ top10 }) {
     }));
   };
 
+  // const getCoisa = async (id) => {
+  //   const response = await fetch(
+  //     `${baseURL}/tv/${id}/content_ratings?language=pt-BR&api_key=${process.env.REACT_APP_TMDB_KEY}`
+  //   )
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       const br = res?.results?.find((result) => result?.iso_3166_1 === "BR");
+  //       return br?.rating;
+  //     });
+  // };
+
   const getClassification = async (id) => {
     const response = await fetch(
-      `${baseURL}/movie/${id}/release_dates?api_key=${process.env.REACT_APP_TMDB_KEY}`
+      `${baseURL}/tv/${id}/content_ratings?language=pt-BR&api_key=${process.env.REACT_APP_TMDB_KEY}`
     )
       .then((res) => res.json())
       .then((res) => {
-        const resultBR = res?.results.find(
-          (result) => result?.iso_3166_1 === "BR"
-        );
-        if (resultBR !== null) {
-          const releaseDates = resultBR?.release_dates;
-          if (releaseDates?.length > 0) {
-            const certification = releaseDates[0]?.certification;
-            return certification;
-          } else {
-            console.log(
-              "Não foram encontradas datas de lançamento no objeto 'resultBR'."
-            );
-          }
-        } else {
-          console.log(
-            "Não foi encontrado um objeto 'results' com iso_3166_1 igual a 'BR'."
-          );
-        }
+        const br = res?.results?.find((result) => result?.iso_3166_1 === "BR");
+        return br?.rating;
       })
       .catch((err) => console.log(err));
     setClassification((prevClassifications) => ({
@@ -117,18 +91,18 @@ export default React.memo(function TopTrending({ top10 }) {
     }));
   };
 
-  const getVotesAverage = async (id) => {
-    const response = await fetch(
-      `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
-    )
-      .then((res) => res.json())
-      .then((res) => res?.vote_average);
+  // const getVotesAverage = async (id) => {
+  //   const response = await fetch(
+  //     `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
+  //   )
+  //     .then((res) => res.json())
+  //     .then((res) => res?.vote_average);
 
-    setVotesAverage((prevVotesAverage) => ({
-      ...prevVotesAverage,
-      [id]: response,
-    }));
-  };
+  //   setVotesAverage((prevVotesAverage) => ({
+  //     ...prevVotesAverage,
+  //     [id]: response,
+  //   }));
+  // };
 
   const handleMouseEnter2 = () => {
     setModalOpen(true);
@@ -156,9 +130,11 @@ export default React.memo(function TopTrending({ top10 }) {
     if (window.innerWidth <= 450) {
       setIsMobile(true);
       setMathValue(100);
-    } else {
+    } else if (window.innerWidth <= 768) {
       setIsMobile(false);
-      setMathValue(130);
+      setMathValue(90);
+    } else {
+      setMathValue(80);
     }
     if (
       !(
@@ -176,10 +152,10 @@ export default React.memo(function TopTrending({ top10 }) {
   return (
     <SliderContainer>
       <div>
-        <h2>Top 10 em tendências da semana</h2>
+        <h2 id="origNetH">Original Netflix</h2>
       </div>
       <Slider translateValue={currentIndex * -(mathValue / itemCount)}>
-        {bests?.map((filme, i) => {
+        {items?.map((filme, i) => {
           return (
             <Container
               key={i}
@@ -194,30 +170,26 @@ export default React.memo(function TopTrending({ top10 }) {
             >
               {hoveredItem === filme?.id && (
                 <AboutMovie
-                  nome={filme?.title || filme?.original_title}
+                  nome={filme?.name || filme?.original_name}
                   srcVideo={urlVideos[filme?.id]}
-                  votos={votesAverage[filme?.id]}
+                  votos={filme?.vote_average}
                   classificacao={classification[filme?.id]}
                   isModalOpen={isModalOpen}
-                  type="topTrending"
+                  type="originalNetflix"
                 />
               )}
-              {!isMobile &&
-              (window.innerWidth <= 768 || window.innerWidth > 768) ? (
-                <img className="topNumber" src={`${imageImports[i]}`} alt="" />
-              ) : null}
               <img
-                id="movieBG"
-                src={Xablau}
+                src={Jailson}
                 // src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
                 alt="Capa do filme"
+                style={{ maxWidth: "20rem", maxHeight: "40rem" }}
               />
             </Container>
           );
         })}
       </Slider>
       <Button
-        id="btnPrev"
+        id="btnSliderPrev"
         onClick={handlePrev}
         btnIsVisible={btnIsVisible}
         isMobile={isMobile}
@@ -241,7 +213,7 @@ export default React.memo(function TopTrending({ top10 }) {
         &#8249;
       </Button>
       <Button
-        id="btnNext"
+        id="btnSliderNext"
         onClick={handleNext}
         btnIsVisible={btnIsVisible}
         isMobile={isMobile}
@@ -266,37 +238,37 @@ export default React.memo(function TopTrending({ top10 }) {
       </Button>
     </SliderContainer>
   );
-});
+}
 
 const Container = styled.div`
   position: relative;
   display: flex;
   align-items: center;
   width: max-content;
-  #movieBG {
-    height: 16rem;
-  }
-  &:last-child {
-    .topNumber {
-      object-fit: cover;
-      margin-right: -3rem;
-    }
-  }
   p {
     color: #fff;
     font-size: 14rem;
     margin-right: -2rem;
   }
   img {
-    max-width: 11rem;
+    max-height: 16rem;
     object-fit: fill;
   }
   .topNumber {
-    height: 90%;
-    margin-right: -1rem;
+    height: 10rem;
+    margin-right: -0.5rem;
+  }
+  @media (max-width: 769px) {
+    img {
+      width: 16rem;
+      max-height: 18rem;
+    }
   }
   @media (max-width: 450px) {
     max-width: 100%;
+    img {
+      max-width: 50vw;
+    }
     #classification {
       display: none;
     }
@@ -306,14 +278,14 @@ const Container = styled.div`
 const SliderContainer = styled.div`
   overflow: hidden;
   max-width: 90vw;
-  margin-top: 3rem;
+  /* margin-top: 3rem; */
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  div h2 {
+  #origNetH {
     position: absolute;
     left: -2.5rem;
-    top: 0.5rem;
+    top: 25rem;
   }
 
   h2 {
@@ -325,12 +297,6 @@ const SliderContainer = styled.div`
     flex-wrap: nowrap;
     justify-content: flex-start;
     max-width: 80vw;
-    margin-top: 3rem;
-    div h2 {
-      position: absolute;
-      left: -2.5rem;
-      top: 0.5rem;
-    }
   }
 
   @media (max-width: 450px) {
@@ -362,20 +328,20 @@ const Button = styled.button`
     btnIsVisible || isMobile ? 1 : 0};
 
   ${({ id }) =>
-    id === "btnPrev" &&
+    id === "btnSliderPrev" &&
     css`
       position: absolute;
       z-index: 999;
-      top: 5rem;
+      top: 29rem;
       left: -4rem;
     `}
 
   ${({ id }) =>
-    id === "btnNext" &&
+    id === "btnSliderNext" &&
     css`
       position: absolute;
       z-index: 999;
-      top: 5rem;
+      top: 29rem;
       right: 0;
       left: calc(100vw - 115px);
       @media (max-width: 450px) {

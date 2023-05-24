@@ -10,9 +10,18 @@ import { AiOutlineClose } from "react-icons/ai";
 export default React.memo(function Header() {
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTop, setIsTop] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const param = window.location.pathname;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      window.scrollY > 0 ? setIsTop(true) : setIsTop(false);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,13 +34,13 @@ export default React.memo(function Header() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
+
   const handleProfile = () => {
     isVisible ? setIsVisible(false) : setIsVisible(true);
   };
 
   return (
-    <Container>
+    <Container isTop={isTop}>
       <div id="divLogo">
         <img src={logo} alt="Netflix logo" />
       </div>
@@ -101,11 +110,20 @@ export default React.memo(function Header() {
 const Container = styled.header`
   width: 100vw;
   position: fixed;
-  z-index: 99;
+  z-index: 999;
   display: flex;
   align-items: center;
-  background: #000;
+  transition: 0.2s ease-in-out;
+  ${(props) =>
+    props.isTop
+      ? css`
+          background: #000;
+        `
+      : css`
+          background: transparent;
+        `}
   @media (max-width: 1000px) {
+    background: #000;
     gap: calc(100% - 13rem);
   }
   #divLogo img {
@@ -174,6 +192,7 @@ const Nav = styled.nav`
   gap: 1.5rem;
   @media (max-width: 1000px) {
     opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
+    display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
     transition: 0.2s ease-in-out;
     padding: 1rem;
     position: fixed;

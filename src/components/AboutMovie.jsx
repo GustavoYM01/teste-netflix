@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import ReactPlayer from "react-player";
 import { AiFillStar } from "react-icons/ai";
 import { BiPlus } from "react-icons/bi";
+import Pomba from "../assets/pombo.gif";
 
 export default React.memo(function AboutMovie({
   nome,
@@ -10,8 +11,9 @@ export default React.memo(function AboutMovie({
   votos,
   classificacao,
   isModalOpen,
+  type,
 }) {
-  const [isMoblie, setIsMobile] = useState(null);
+  const [isMobile, setIsMobile] = useState(null);
 
   const decimalFixed = (string) => {
     return Number(string).toFixed(1).toString();
@@ -22,25 +24,32 @@ export default React.memo(function AboutMovie({
   }, []);
   return (
     <Container isModalOpen={isModalOpen}>
-      {!srcVideo?.includes("undefined") && !isMoblie ? (
+      <img src={Pomba} alt="" style={{ height: "8rem", width: "100%" }} />
+      {/* {!srcVideo?.includes("undefined") && !isMobile ? (
         <div id="trailerVideo">
           <ReactPlayer url={srcVideo} controls playing />
         </div>
-      ) : isMoblie ? null : (
+      ) : isMobile ? null : (
         <div id="noVideo">
           <p>Sem pré-visualização</p>
         </div>
-      )}
+      )} */}
       <p className="movieInfo">{nome}</p>
-      {classificacao ? (
-        <p className="classification">{classificacao}</p>
-      ) : (
-        <p className="classification">L</p>
-      )}
-      <div id="tools">
-        <AiFillStar />
-        <p className="movieInfo">{decimalFixed(votos)}</p>
-        <BiPlus id="btnAdd" />
+      <div id="general">
+        {classificacao ? (
+          <p className="classification" type={type}>
+            {classificacao}
+          </p>
+        ) : (
+          <p className="classification" type={type}>
+            L
+          </p>
+        )}
+        <div id="tools">
+          <AiFillStar />
+          <p className="movieInfo">{decimalFixed(votos)}</p>
+          <BiPlus id="btnAdd" />
+        </div>
       </div>
     </Container>
   );
@@ -49,7 +58,7 @@ export default React.memo(function AboutMovie({
 const Container = styled.div`
   font-weight: bold;
   position: absolute;
-  top: 1.7rem;
+  top: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.8);
@@ -58,6 +67,11 @@ const Container = styled.div`
   animation: ${({ isModalOpen }) => (isModalOpen ? zoomIn : zoomOut)} 0.1s
     ease-in-out;
   animation-fill-mode: both;
+  #general {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
   #noVideo {
     p {
       margin-left: 0.5rem;
@@ -67,16 +81,16 @@ const Container = styled.div`
   }
   .classification {
     text-align: center;
-    max-width: 20%;
     font-size: 1rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     margin-left: 0.5rem;
     border: 1px solid #fff;
     border-radius: 0.2rem;
-    padding: 2px;
+    padding: 4px;
   }
   .movieInfo {
+    max-width: 90%;
     font-size: 1rem;
     margin-left: 0.5rem;
   }
@@ -94,26 +108,14 @@ const Container = styled.div`
     }
   }
   @media (max-width: 450px) {
+    #general {
+      margin-top: 6%;
+    }
     .classification {
-      max-width: 20% !important;
-      margin-top: 0.8rem !important;
-      padding: 1px 2px;
-    }
-    .movieInfo {
-      max-width: 90%;
-    }
-    #tools {
-      margin-top: 1rem;
+      width: 18%;
     }
     #trailerVideo {
       display: none;
-    }
-  }
-  @media (max-width: 769px) {
-    .classification {
-      max-width: 15%;
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
     }
   }
   @media (max-width: 1000px) {
