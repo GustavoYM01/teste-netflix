@@ -334,8 +334,9 @@ const SliderContainer = styled.div`
   }
 
   @media (max-width: 450px) {
+    max-width: 60vw;
     h2 {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
   }
 `;
