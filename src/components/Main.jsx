@@ -7,6 +7,7 @@ import OriginalNetflix from "./OriginalNetflix";
 import { AiOutlineClose } from "react-icons/ai";
 import ReactPlayer from "react-player";
 import WinBaby from "../assets/winBaby.gif";
+import ActionMovies from "./ActionMovies";
 
 export default function Main() {
   const [tendencia, setTendencia] = useState(null);
@@ -179,11 +180,13 @@ export default function Main() {
           </div>
         )}
       </div>
-      <div></div>
       <ContainerTopTrending>
         <TopTrending top10={top10} />
         <div id="containerOrigNet">
           <OriginalNetflix originalNetflix={originalNetflix} />
+        </div>
+        <div id="containerActMovies">
+          <ActionMovies originalNetflix={originalNetflix} />
         </div>
       </ContainerTopTrending>
     </Container>
@@ -193,7 +196,7 @@ export default function Main() {
 const Container = styled.section`
   position: relative;
   max-width: 100vw;
-  height: 22rem;
+  /* height: 22rem; */
   #desc {
     position: absolute;
     top: 70vh;
@@ -260,8 +263,20 @@ const Container = styled.section`
     display: flex;
     gap: 1rem;
   } */
+  #containerActMovies {
+    margin-top: 7.5rem;
+    h2 {
+      color: #fff;
+    }
+  }
   #containerOrigNet {
-    margin-top: 8rem;
+    margin-top: 6rem;
+    h2 {
+      color: #fff;
+    }
+  }
+  #containerActMovies {
+    /* margin-top: 30rem; */
     h2 {
       color: #fff;
     }
@@ -320,8 +335,11 @@ const Container = styled.section`
       }
     }
   }
+  @media (max-width: 1024px) {
+    height: 20rem;
+  }
   @media (max-width: 769px) {
-    height: 16rem;
+    height: 35rem;
     #desc {
       max-width: 90%;
       left: 1rem;
@@ -339,7 +357,7 @@ const Container = styled.section`
     }
   }
   @media (max-width: 450px) {
-    height: 24rem;
+    height: 45rem;
     #desc {
       top: 70vh;
     }

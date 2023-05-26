@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import AboutMovie from "./AboutMovie";
 import Jailson from "../assets/jailson.jpg";
 
-export default function OriginalNetflix({ originalNetflix }) {
+export default function ActionMovies({ originalNetflix }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [urlVideos, setUrlVideos] = useState({});
   // const [votesAverage, setVotesAverage] = useState({});
@@ -151,7 +151,7 @@ export default function OriginalNetflix({ originalNetflix }) {
   return (
     <SliderContainer>
       <div>
-        <h2 id="origNetH">Original Netflix</h2>
+        <h2 id="actionMovTitle">Filmes de Ação</h2>
       </div>
       <Slider translateValue={currentIndex * -(mathValue / itemCount)}>
         {items?.map((filme, i) => {
@@ -174,7 +174,7 @@ export default function OriginalNetflix({ originalNetflix }) {
                   votos={filme?.vote_average}
                   classificacao={classification[filme?.id]}
                   isModalOpen={isModalOpen}
-                  type="originalNetflix"
+                  type="actionMovies"
                 />
               )}
               <img
@@ -188,7 +188,7 @@ export default function OriginalNetflix({ originalNetflix }) {
         })}
       </Slider>
       <Button
-        id="btnSliderPrev"
+        id="CATAPIMBA"
         onClick={handlePrev}
         btnIsVisible={btnIsVisible}
         isMobile={isMobile}
@@ -212,7 +212,7 @@ export default function OriginalNetflix({ originalNetflix }) {
         &#8249;
       </Button>
       <Button
-        id="btnSliderNext"
+        id="CATAPIMBA123"
         onClick={handleNext}
         btnIsVisible={btnIsVisible}
         isMobile={isMobile}
@@ -281,10 +281,13 @@ const SliderContainer = styled.div`
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  #origNetH {
+  #actionMovTitle {
     position: absolute;
     left: -2.5rem;
-    top: 23rem;
+    top: 45rem;
+    @media (max-width: 769px) {
+      top: 47rem;
+    }
   }
 
   h2 {
@@ -329,20 +332,20 @@ const Button = styled.button`
     btnIsVisible || isMobile ? 1 : 0};
 
   ${({ id }) =>
-    id === "btnSliderPrev" &&
+    id === "CATAPIMBA" &&
     css`
       position: absolute;
       z-index: 999;
-      top: 27rem;
+      top: 50rem;
       left: -4rem;
     `}
 
   ${({ id }) =>
-    id === "btnSliderNext" &&
+    id === "CATAPIMBA123" &&
     css`
       position: absolute;
       z-index: 999;
-      top: 27rem;
+      top: 50rem;
       right: 0;
       left: calc(100vw - 115px);
       @media (max-width: 450px) {
