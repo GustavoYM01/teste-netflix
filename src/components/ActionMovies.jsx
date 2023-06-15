@@ -3,10 +3,10 @@ import styled, { css } from "styled-components";
 import AboutMovie from "./AboutMovie";
 import Jailson from "../assets/jailson.jpg";
 
-export default function ActionMovies({ originalNetflix }) {
+export default function ActionMovies({ actionMovies }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [urlVideos, setUrlVideos] = useState({});
-  // const [votesAverage, setVotesAverage] = useState({});
+  const [genres, setGenres] = useState({});
   const [mathValue, setMathValue] = useState(0);
   const [classification, setClassification] = useState({});
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -14,7 +14,7 @@ export default function ActionMovies({ originalNetflix }) {
   const [isMobile, setIsMobile] = useState(null);
   const [btnIsVisible, setBtnIsVisible] = useState(true);
 
-  const items = originalNetflix?.slice(0, 10);
+  const items = actionMovies?.slice(0, 10);
 
   const itemCount = items?.length;
 
@@ -23,6 +23,7 @@ export default function ActionMovies({ originalNetflix }) {
   const handleMouseEnter = (id) => {
     setHoveredItem(id);
     getVideo(id);
+    getGenres(id);
     getClassification(id);
     // getCoisa(id);
     // getVotesAverage(id);
@@ -34,10 +35,10 @@ export default function ActionMovies({ originalNetflix }) {
       ...prevUrlVideos,
       [id]: null,
     }));
-    // setVotesAverage((prevVotesAverage) => ({
-    //   ...prevVotesAverage,
-    //   [id]: null,
-    // }));
+    setGenres((prevGenres) => ({
+      ...prevGenres,
+      [id]: null,
+    }));
     setClassification((prevClassifications) => ({
       ...prevClassifications,
       [id]: null,
@@ -46,14 +47,14 @@ export default function ActionMovies({ originalNetflix }) {
   //https://api.themoviedb.org/3/tv/119051/videos?api_key=98def43abee228fc5dcae8ee5c2fddcc&language=pt-BR
   const getVideo = async (id) => {
     const response = await fetch(
-      `${baseURL}/tv/${id}/videos?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR`
+      `${baseURL}/movie/${id}/videos?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR`
     )
       .then((res) => res.json())
       .then((res) => {
         const trailerIndex = res?.results?.findIndex(
           (element) => element?.type === "Trailer"
         );
-        const trailerURL = `https://www.youtube.com/watch?v=${res?.results[trailerIndex]?.key}`;
+        const trailerURL = `https://www.youtube.com/embed/${res?.results[trailerIndex]?.key}`;
         return trailerURL;
       });
 
@@ -63,25 +64,50 @@ export default function ActionMovies({ originalNetflix }) {
     }));
   };
 
-  // const getCoisa = async (id) => {
-  //   const response = await fetch(
-  //     `${baseURL}/tv/${id}/content_ratings?language=pt-BR&api_key=${process.env.REACT_APP_TMDB_KEY}`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       const br = res?.results?.find((result) => result?.iso_3166_1 === "BR");
-  //       return br?.rating;
-  //     });
-  // };
+  const getGenres = async (id) => {
+    try {
+      const response = await fetch(
+        `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao obter os gêneros.");
+      }
+
+      const res = await response.json();
+      const genresArray = res?.genres;
+
+      let arrGenreName = [];
+      genresArray?.forEach((item) => {
+        const propName = item?.name;
+        arrGenreName.push(propName);
+      });
+
+      setGenres((prevGenres) => ({
+        ...prevGenres,
+        [id]: arrGenreName,
+      }));
+    } catch (error) {
+      console.log("Erro:", error.message);
+    }
+  };
 
   const getClassification = async (id) => {
     const response = await fetch(
-      `${baseURL}/tv/${id}/content_ratings?language=pt-BR&api_key=${process.env.REACT_APP_TMDB_KEY}`
+      `${baseURL}/movie/${id}/release_dates?language=pt-BR&api_key=${process.env.REACT_APP_TMDB_KEY}`
     )
       .then((res) => res.json())
       .then((res) => {
-        const br = res?.results?.find((result) => result?.iso_3166_1 === "BR");
-        return br?.rating;
+        const resultBR = res?.results.find(
+          (result) => result?.iso_3166_1 === "BR"
+        );
+        if (resultBR !== null) {
+          const releaseDates = resultBR?.release_dates;
+          if (releaseDates?.length > 0) {
+            const certification = releaseDates[0]?.certification;
+            return certification;
+          }
+        }
       })
       .catch((err) => console.log(err));
     setClassification((prevClassifications) => ({
@@ -89,19 +115,6 @@ export default function ActionMovies({ originalNetflix }) {
       [id]: response,
     }));
   };
-
-  // const getVotesAverage = async (id) => {
-  //   const response = await fetch(
-  //     `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((res) => res?.vote_average);
-
-  //   setVotesAverage((prevVotesAverage) => ({
-  //     ...prevVotesAverage,
-  //     [id]: response,
-  //   }));
-  // };
 
   const handleMouseEnter2 = () => {
     setModalOpen(true);
@@ -169,7 +182,8 @@ export default function ActionMovies({ originalNetflix }) {
             >
               {hoveredItem === filme?.id && (
                 <AboutMovie
-                  nome={filme?.name || filme?.original_name}
+                  nome={filme?.title || filme?.original_title}
+                  generos={genres[filme?.id]}
                   srcVideo={urlVideos[filme?.id]}
                   votos={filme?.vote_average}
                   classificacao={classification[filme?.id]}
@@ -178,10 +192,8 @@ export default function ActionMovies({ originalNetflix }) {
                 />
               )}
               <img
-                src={Jailson}
-                // src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
+                src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
                 alt="Capa do filme"
-                style={{ maxWidth: "20rem", maxHeight: "40rem" }}
               />
             </Container>
           );
@@ -277,16 +289,15 @@ const Container = styled.div`
 const SliderContainer = styled.div`
   overflow: hidden;
   max-width: 90vw;
-  /* margin-top: 3rem; */
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
   #actionMovTitle {
     position: absolute;
     left: -2.5rem;
-    top: 45rem;
-    @media (max-width: 769px) {
-      top: 47rem;
+    top: 24rem;
+    @media (max-width: 450px) {
+      top: 25rem;
     }
   }
 
@@ -336,8 +347,14 @@ const Button = styled.button`
     css`
       position: absolute;
       z-index: 999;
-      top: 50rem;
+      top: 27rem;
       left: -4rem;
+      @media (max-width: 769px) {
+        top: 30rem;
+      }
+      @media (max-width: 450px) {
+        top: 30rem;
+      }
     `}
 
   ${({ id }) =>
@@ -345,10 +362,14 @@ const Button = styled.button`
     css`
       position: absolute;
       z-index: 999;
-      top: 50rem;
+      top: 27rem;
       right: 0;
       left: calc(100vw - 115px);
+      @media (max-width: 769px) {
+        top: 30rem;
+      }
       @media (max-width: 450px) {
+        top: 30rem;
         left: calc(100vw - 6rem);
       }
     `}

@@ -3,10 +3,10 @@ import styled, { keyframes } from "styled-components";
 import ReactPlayer from "react-player";
 import { AiFillStar } from "react-icons/ai";
 import { BiPlus } from "react-icons/bi";
-import Pomba from "../assets/pombo.gif";
 
 export default React.memo(function AboutMovie({
   nome,
+  generos,
   srcVideo,
   votos,
   classificacao,
@@ -22,10 +22,25 @@ export default React.memo(function AboutMovie({
   useEffect(() => {
     window.innerWidth <= 450 ? setIsMobile(true) : setIsMobile(false);
   }, []);
+
+  function truncarTexto(texto, qtdLimite) {
+    return texto.length > qtdLimite ? texto.slice(0, qtdLimite) + "..." : texto;
+  }
+
+  function itemsList(array) {
+    const someGenres = array?.slice(0, 2);
+    return (
+      <>
+        {someGenres?.map((item, index) => (
+          <li key={index}>{truncarTexto(item, 8)}</li>
+        ))}
+      </>
+    );
+  }
+
   return (
     <Container isModalOpen={isModalOpen}>
-      <img src={Pomba} alt="" style={{ height: "8rem", width: "100%" }} />
-      {/* {!srcVideo?.includes("undefined") && !isMobile ? (
+      {!srcVideo?.includes("undefined") && !isMobile ? (
         <div id="trailerVideo">
           <ReactPlayer url={srcVideo} controls playing />
         </div>
@@ -33,8 +48,9 @@ export default React.memo(function AboutMovie({
         <div id="noVideo">
           <p>Sem pré-visualização</p>
         </div>
-      )} */}
-      <p className="movieInfo">{nome}</p>
+      )}
+      <p className="movieInfo">{truncarTexto(nome, 15)}</p>
+      <ul id="listaGeneros">{itemsList(generos)}</ul>
       <div id="general">
         {classificacao ? (
           <p className="classification" type={type}>
@@ -67,6 +83,17 @@ const Container = styled.div`
   animation: ${({ isModalOpen }) => (isModalOpen ? zoomIn : zoomOut)} 0.1s
     ease-in-out;
   animation-fill-mode: both;
+  #listaGeneros {
+    margin-left: 0.5rem;
+    margin-top: 0.3rem;
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    li {
+      overflow-x: hidden;
+      color: #acacac;
+    }
+  }
   #general {
     display: flex;
     align-items: center;
@@ -85,9 +112,6 @@ const Container = styled.div`
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     margin-left: 0.5rem;
-    border: 1px solid #fff;
-    border-radius: 0.2rem;
-    padding: 4px;
   }
   .movieInfo {
     max-width: 90%;

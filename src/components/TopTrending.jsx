@@ -11,7 +11,6 @@ import topt7 from "../assets/top10/7.svg";
 import topt8 from "../assets/top10/8.svg";
 import topt9 from "../assets/top10/9.svg";
 import topt10 from "../assets/top10/10.svg";
-import Xablau from "../assets/xablau.png";
 
 export default React.memo(function TopTrending({ top10 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -19,6 +18,7 @@ export default React.memo(function TopTrending({ top10 }) {
   const [urlVideos, setUrlVideos] = useState({});
   const [votesAverage, setVotesAverage] = useState({});
   const [classification, setClassification] = useState({});
+  const [genres, setGenres] = useState({});
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(null);
@@ -45,6 +45,7 @@ export default React.memo(function TopTrending({ top10 }) {
 
   const handleMouseEnter = (id) => {
     setHoveredItem(id);
+    getGenres(id);
     getVideo(id);
     getClassification(id);
     getVotesAverage(id);
@@ -54,6 +55,10 @@ export default React.memo(function TopTrending({ top10 }) {
     setHoveredItem(null);
     setUrlVideos((prevUrlVideos) => ({
       ...prevUrlVideos,
+      [id]: null,
+    }));
+    setGenres((prevGenres) => ({
+      ...prevGenres,
       [id]: null,
     }));
     setVotesAverage((prevVotesAverage) => ({
@@ -75,7 +80,7 @@ export default React.memo(function TopTrending({ top10 }) {
         const trailerIndex = res?.videos?.results?.findIndex(
           (element) => element?.type === "Trailer"
         );
-        const trailerURL = `https://www.youtube.com/watch?v=${res?.videos?.results[trailerIndex]?.key}`;
+        const trailerURL = `https://www.youtube.com/embed/${res?.videos?.results[trailerIndex]?.key}`;
         return trailerURL;
       });
 
@@ -99,15 +104,7 @@ export default React.memo(function TopTrending({ top10 }) {
           if (releaseDates?.length > 0) {
             const certification = releaseDates[0]?.certification;
             return certification;
-          } else {
-            console.log(
-              "Não foram encontradas datas de lançamento no objeto 'resultBR'."
-            );
           }
-        } else {
-          console.log(
-            "Não foi encontrado um objeto 'results' com iso_3166_1 igual a 'BR'."
-          );
         }
       })
       .catch((err) => console.log(err));
@@ -128,6 +125,34 @@ export default React.memo(function TopTrending({ top10 }) {
       ...prevVotesAverage,
       [id]: response,
     }));
+  };
+
+  const getGenres = async (id) => {
+    try {
+      const response = await fetch(
+        `${baseURL}/movie/${id}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=pt-BR&append_to_response=videos`
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao obter os gêneros.");
+      }
+
+      const res = await response.json();
+      const genresArray = res?.genres;
+
+      let arrGenreName = [];
+      genresArray?.forEach((item) => {
+        const propName = item?.name;
+        arrGenreName.push(propName);
+      });
+
+      setGenres((prevGenres) => ({
+        ...prevGenres,
+        [id]: arrGenreName,
+      }));
+    } catch (error) {
+      console.log("Erro:", error.message);
+    }
   };
 
   const handleMouseEnter2 = () => {
@@ -156,6 +181,8 @@ export default React.memo(function TopTrending({ top10 }) {
     if (window.innerWidth <= 450) {
       setIsMobile(true);
       setMathValue(100);
+    } else if (window.innerWidth <= 768) {
+      setIsMobile(false);
     } else {
       setIsMobile(false);
       setMathValue(130);
@@ -195,6 +222,7 @@ export default React.memo(function TopTrending({ top10 }) {
               {hoveredItem === filme?.id && (
                 <AboutMovie
                   nome={filme?.title || filme?.original_title}
+                  generos={genres[filme?.id]}
                   srcVideo={urlVideos[filme?.id]}
                   votos={votesAverage[filme?.id]}
                   classificacao={classification[filme?.id]}
@@ -208,8 +236,7 @@ export default React.memo(function TopTrending({ top10 }) {
               ) : null}
               <img
                 id="movieBG"
-                src={Xablau}
-                // src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
+                src={`https://image.tmdb.org/t/p/original/${filme?.poster_path}`}
                 alt="Capa do filme"
               />
             </Container>
